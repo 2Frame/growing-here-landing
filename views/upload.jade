@@ -1,0 +1,14 @@
+doctype htm
+html
+  head
+    title!= title
+  body
+    div.uploadbox
+    form(id="upload", action="/upload", method="post", enctype="multipart/form-data")
+      input(type="file", name="uploadFile", id="uploadFile")
+      input(type="hidden", id="molduraID", name="molduraID")
+      input(type="hidden", id="posicaoID", name="posicaoID")
+    if uploads
+      ul#files
+        each photo in uploads
+          li.file(data-path="#{photo.file.path}", data-x="#{photo.posicao.x}", data-y="#{photo.posicao.y}", data-w="#{photo.posicao.w}", data-h="#{photo.posicao.h}")

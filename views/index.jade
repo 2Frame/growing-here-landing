@@ -1,0 +1,67 @@
+doctype htm
+html
+  head
+    title Mondelez
+    
+    <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    script(type='text/javascript', src='/static/js/jquery.min.js')
+    <!--[if lt IE 9]><script type="text/javascript", src="/static/js/ie8.js"></script><![endif]-->
+    
+    link(href='https://fonts.googleapis.com/css?family=Lato:400,400italic', rel='stylesheet', type='text/css')
+    script.
+      var obj_molduras = !{JSON.stringify(molduras)};
+    script(type='text/javascript' src='/static/js/main.js')
+    link(rel='stylesheet', href='static/css/main.css')
+  body
+    .wrapper
+        header
+            .logo1
+              img(src='static/img/logo-miu.png', alt='MIU')
+            .logo2
+              img(src='static/img/logo-grow.png', alt='Grow')
+            .clear
+            h2 Although Growing Here Week is over, you can continue creating remote connections! 
+            p A Growing Here Week chegou ao fim, mas você pode continuar criando formas de aproximar suas conexões remotas!
+            p Growing Here week se terminó, sin embargo continua creando conexiones remotas!
+            h3 Practice your “out of the box” moment. Create and send a joyful image to your team!
+            p Pratique o seu momento “fora da caixa”, crie e envie uma imagem Joy para o seu time!
+            p Practica crear momentos "fuera de la caja"  y comparte imágenes de momentos divertidos.
+        div.canvas
+          input(type="hidden", id="molduraID" value="0")
+          input(type="hidden", id="uploads", value="0")
+          canvas(id="canvas", width="724", height="230")
+        
+        div.upload
+          div.buttons
+            button.loadImage.
+              Load Image
+          iframe(src="/upload", id="ifUp", style="display:none;")
+        
+        h4 How big is your team?
+        p.text Qual o tamanho do seu time?
+        p.text Que tan grande es tu equipo?
+        
+        ul.molduras
+          each moldura in molduras
+            li
+              a.moldura(href="#", data-id="#{moldura.id}")
+                img(src="#{moldura.minifundo}")
+                
+        .clear
+        
+        h4 Download picture. Save and share it with your team via e-mail!
+        p.text Clique aqui para fazer o download! Salve a imagem e envie para o seu time!
+        p.text Descarga imágenes. Guarda y comparte con tus equipos por correo Electrónico.
+        
+        .clear
+        
+        a(id="download", href="#download", download="foto.png").
+            Download
+            
+        a(id="clear-image", href="").
+            Delete images
+        
+        .clear
+        
+        footer
+            img(src='static/img/logo-mon.jpg', alt='Mondelez')
