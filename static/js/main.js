@@ -19,25 +19,25 @@ function resetSession() {
 }
 
 $(function () {
-  $('#download').click(function () {
-    try {
-      var canvas = document.getElementById('canvas');
-      
-      if (canvas.msToBlob) {
-        var blob = canvas.msToBlob();
-        window.navigator.msSaveBlob(blob, 'foto.png');
-      } else {
-        var dt = canvas.toDataURL('image/png');
-        dt = dt.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
-        dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=foto.png');
-        console.log('[image]' + dt);
-        this.href = dt;
-      }
-      //return true;
-    } catch (err) {
-      console.log('error: download ' + err);
-    }
-  });
+  //$('#download').click(function () {
+  //  try {
+  //    var canvas = document.getElementById('canvas');
+  //    
+  //    if (canvas.msToBlob) {
+  //      var blob = canvas.msToBlob();
+  //      window.navigator.msSaveBlob(blob, 'foto.png');
+  //    } else {
+  //      var dt = canvas.toDataURL('image/png');
+  //      dt = dt.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
+  //      dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=foto.png');
+  //      console.log('[image]' + dt);
+  //      this.href = dt;
+  //    }
+  //    //return true;
+  //  } catch (err) {
+  //    console.log('error: download ' + err);
+  //  }
+  //});
   $('#ifUp').on('load', function () {
     $("#ifUp").contents().find("#uploadFile").on('change', function () {
       var timerId;

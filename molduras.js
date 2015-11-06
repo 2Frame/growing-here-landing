@@ -9,6 +9,8 @@ var multipart     = require('connect-multiparty');
 var bodyParser    = require('body-parser');
 var url           = require("url");
 var path          = require("path");
+var mime          = require('mime');
+var gm            = require('gm');
 //require("console-stamp")(console, { 'pattern': '' });
 
 var config_path = 'molduras-config.json';
@@ -25,8 +27,8 @@ nconf.defaults({
         'minifundo' : '/static/img/thumb-1.jpg', 
         'espacos': 2, 
         'posicoes': [ 
-          { id: 0, 'x': 212, 'y': 99, 'w': 100, 'h': 70  },
-          { id: 1, 'x': 404, 'y': 99, 'w': 100, 'h': 70  }
+          { id: 0, 'x': 212, 'y': 100, 'w': 100, 'h': 70  },
+          { id: 1, 'x': 404, 'y': 100, 'w': 100, 'h': 70  }
         ]
       },
       { 
@@ -99,10 +101,16 @@ app.use(function (req, res, next) {
   next();
 });
 
+function resetSession(req) {
+  req.session.destroy();
+  console.log('[session cleaned]');
+}
+
 app.set('views', './views');
 app.set('view engine', 'jade');
 
 app.get('/', function (req, res, next) {
+  nconf.load();
   var molduras = nconf.get('molduras');
   res.render('index', { title: 'FNORD', areas: 3, molduras: molduras });
 });
@@ -114,9 +122,47 @@ app.get('/files.json', function (req, res, next) {
 });
 
 app.get('/resetSession', function (req, res, next) {
-  req.session.destroy();
-  console.log('[session cleaned]')
+  resetSession(req);
   res.send('ok');
+});
+
+app.get('/download', function (req, res, next) {
+  try {
+    var molduras = nconf.get('molduras');
+    console.log('[molduras=' + JSON.stringify(req.session) + ']');
+    var moldura = molduras[req.session.molduraID];
+    var molduraPath = moldura.fundo;
+    var newImgPath = '/static/done/' + req.sessionID + '.png';
+    var fullNewImgPath = __dirname + newImgPath;
+    var image = gm(__dirname + molduraPath);
+    for (var i = 0, len = req.session.photos.length; i < len; i++) {
+      var photo = req.session.photos[i];
+      var filename = __dirname + (photo.file || photo);
+      var x = photo.posicao.x;
+      var y = photo.posicao.y;
+      var w = photo.posicao.w;
+      var h = photo.posicao.h;
+      var drawCommand = 'image  Over ' + x + ',' + y + ' ' + w + ',' + h + ' ' + filename;
+      console.log('[drawCommand]' + drawCommand);
+      image.draw(drawCommand);
+    }
+    image.write(fullNewImgPath, function (err) {
+      if (err) 
+        console.log('error: gm image saving: ' + err);
+      else {
+        var filename = path.basename(fullNewImgPath);
+        var mimetype = mime.lookup(fullNewImgPath);
+        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        res.setHeader('Content-type', mimetype);
+        var filestream = fs.createReadStream(fullNewImgPath);
+        console.log('[file downloaded] ' + fullNewImgPath);
+        filestream.pipe(res);
+      }
+    });
+  } catch (e) {
+    if (e) 
+        console.log('error: gm: ' + e);
+  }
 });
 
 app.get('/upload', function (req, res, next) {
@@ -132,13 +178,16 @@ app.post('/upload', multipartMiddleware, function (req, res, next) {
       fs.writeFile(__dirname + newImgPath, data, function (err) {
         if (err) 
           console.log('error: saving file[' + req.files.uploadFile.path + '|' + newImgPath + ']: ' + err);
-        var molduras = nconf.get('molduras');
-        var files = req.session.photos;
-        var file = { posicao: molduras[req.body.molduraID].posicoes[req.body.posicaoID], file: newImgPath };
-        files[req.body.posicaoID] = file;
-        req.session.photos = files;
-        req.session.save();
-        res.redirect('/upload');
+        else {
+          var molduras = nconf.get('molduras');
+          var files = req.session.photos;
+          var file = { posicao: molduras[req.body.molduraID].posicoes[req.body.posicaoID], file: newImgPath };
+          files[req.body.posicaoID] = file;
+          req.session.molduraID = req.body.molduraID;
+          req.session.photos = files;
+          req.session.save();
+          res.redirect('/upload');
+        }
       });
     });
   } catch (error) {

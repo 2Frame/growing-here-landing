@@ -1,12 +1,10 @@
-doctype htm
+doctype html5
 html
   head
     title Mondelez
-    
-    <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <!--[if lt IE 9]><script type="text/javascript" src="/static/js/html5shiv.min.js"></script><![endif]-->
+    <!--[if lte IE 8]><script type="text/javascript" src="/static/js/excanvas.js"></script><![endif]-->
     script(type='text/javascript', src='/static/js/jquery.min.js')
-    <!--[if lt IE 9]><script type="text/javascript", src="/static/js/ie8.js"></script><![endif]-->
-    
     link(href='https://fonts.googleapis.com/css?family=Lato:400,400italic', rel='stylesheet', type='text/css')
     script.
       var obj_molduras = !{JSON.stringify(molduras)};
@@ -55,7 +53,7 @@ html
         
         .clear
         
-        a(id="download", href="#download", download="foto.png").
+        a(id="download", href="/download", download="foto.png").
             Download
             
         a(id="clear-image", href="").
