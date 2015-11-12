@@ -3,22 +3,30 @@ function loadImage(source, callback) {
     var image = new Image();
     image.onload = function() {
       //console.log('[image-loaded]');
-      callback(image, source);
+      
+      setTimeout(function() {
+        callback(image, source);
+      }, 500);
     };
     //console.log('[loadimage]' + source);
     image.src = source;
   } catch (e) {
-    console.log('erro load image: '+e);
+    alert('erro load image: '+e);
   }
 }
 
 function resetSession() {
-  $.getJSON('/resetSession', function(data) {
+  $.ajax({
+      url: "/resetSession",
+      cache: false,
+      dataType: "json",
+      success:  function(data) {
+    }
   });
   return true;
 }
 
-$(function () {
+$(window).load(function () {
   //$('#download').click(function () {
   //  try {
   //    var canvas = document.getElementById('canvas');
@@ -54,42 +62,87 @@ $(function () {
       $("#ifUp").contents().find("#posicaoID").val($(this).attr('data-id'));
       $("#ifUp").contents().find("#uploadFile").click();
     });
-    $.getJSON( "/files.json", function(data) {
-      var canvas = document.getElementById('canvas');
-      var context = canvas.getContext('2d');
-      var nextIdx = eval($('#molduraID').val());
-      var mold = obj_molduras[nextIdx];
-      //context.clearRect(0, 0, canvas.width, canvas.height);
-      //loadImage(
-      //    mold.fundo, 
-      //    function(image) {
-      //      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      //      console.log('[fundo]'+JSON.stringify(mold.fundo));
-      //    }
-      //  );
-      $.each(data.uploads, function(i,elem) {
-        var path = elem.file || elem;
-        var x = elem.posicao.x;
-        var y = elem.posicao.y;
-        var w = elem.posicao.w;
-        var h = elem.posicao.h;
-        loadImage(
-          path, 
-          function(image) {
-            context.drawImage(image, x, y, w, h);
-            console.log('[photo' + i + ']'+JSON.stringify(path));
-          }
-        );
-      });
-      //loadImage(
-      //  mold.fundo, 
-      //  function(image) {
-      //    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      //    console.log('[fundo again]'+JSON.stringify(mold.fundo));
-      //  }
-      //);
-      context.save();
+    
+    $.ajax({
+      url: "/files.json",
+      cache: false,
+      dataType: "json",
+      success: function(data) {
+          var canvas = document.getElementById('canvas');
+          var context = canvas.getContext('2d');
+          var nextIdx = eval($('#molduraID').val());
+          var mold = obj_molduras[nextIdx];
+          //context.clearRect(0, 0, canvas.width, canvas.height);
+          //loadImage(
+          //    mold.fundo, 
+          //    function(image) {
+          //      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          //      console.log('[fundo]'+JSON.stringify(mold.fundo));
+          //    }
+          //  );
+          $.each(data.uploads, function(i,elem) {
+            var path = elem.file || elem;
+            var x = elem.posicao.x;
+            var y = elem.posicao.y;
+            var w = elem.posicao.w;
+            var h = elem.posicao.h;
+            loadImage(
+              path, 
+              function(image) {
+                context.drawImage(image, x, y, w, h);
+                alert('[photo' + i + ']'+JSON.stringify(path));
+              }
+            );
+          });
+          //loadImage(
+          //  mold.fundo, 
+          //  function(image) {
+          //    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          //    console.log('[fundo again]'+JSON.stringify(mold.fundo));
+          //  }
+          //);
+          context.save();
+        },
+      error: function (request, status, error) { alert(status + ", " + error); }
     });
+    
+    
+    // $.getJSON( "/files.json", function(data) {
+    //   var canvas = document.getElementById('canvas');
+    //   var context = canvas.getContext('2d');
+    //   var nextIdx = eval($('#molduraID').val());
+    //   var mold = obj_molduras[nextIdx];
+    //   //context.clearRect(0, 0, canvas.width, canvas.height);
+    //   //loadImage(
+    //   //    mold.fundo, 
+    //   //    function(image) {
+    //   //      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    //   //      console.log('[fundo]'+JSON.stringify(mold.fundo));
+    //   //    }
+    //   //  );
+    //   $.each(data.uploads, function(i,elem) {
+    //     var path = elem.file || elem;
+    //     var x = elem.posicao.x;
+    //     var y = elem.posicao.y;
+    //     var w = elem.posicao.w;
+    //     var h = elem.posicao.h;
+    //     loadImage(
+    //       path, 
+    //       function(image) {
+    //         context.drawImage(image, x, y, w, h);
+    //         alert('[photo' + i + ']'+JSON.stringify(path));
+    //       }
+    //     );
+    //   });
+    //   //loadImage(
+    //   //  mold.fundo, 
+    //   //  function(image) {
+    //   //    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    //   //    console.log('[fundo again]'+JSON.stringify(mold.fundo));
+    //   //  }
+    //   //);
+    //   context.save();
+    // });
   });
   $('#clear-image').click(resetSession);
   $('.moldura').click(function () {
